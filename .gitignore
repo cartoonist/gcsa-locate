@@ -1,0 +1,51 @@
+# ctags
+tags
+
+# compile flags
+compile_commands.json
+
+#autom4te.cache
+autom4te.cache
+
+# test data svg files
+test/data/**/*.svg
+
+## GitHub defaults ##
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Backups
+*.bak
+*~
+
+# Doxygen files
+doc/html/*
+doc/latex/*
+doc/doxygen_sqlite3.db
