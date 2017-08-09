@@ -22,6 +22,7 @@
 #include <seqan/arg_parse.h>
 #include <gcsa/gcsa.h>
 
+#include <config.h>
 #include "options.h"
 #include "release.h"
 
@@ -129,8 +130,7 @@ parse_args( Options& options, int argc, char* argv[] )
   // Embedding program's meta data and build information.
   setShortDescription( parser, release::short_desc );
   setVersion( parser, release::version );
-  // :TODO:Thu Aug 03 17:05:\@cartoonist: date should be captured from git.
-  setDate( parser, __DATE__ );
+  setDate( parser, LAST_MOD_DATE );
   addDescription( parser, release::desc );
   // parse command line.
   auto res = seqan::parse( parser, argc, argv );

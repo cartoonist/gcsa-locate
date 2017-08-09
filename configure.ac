@@ -6,6 +6,8 @@ AC_INIT([gcsa-locate], [0.0.1], [ali.ghaffaari@mpi-inf.mpg.de], [gcsa_locate],
         [https://github.com/cartoonist/gcsa-locate])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 AC_CONFIG_SRCDIR([src/main.cc])
+
+AC_DEFINE_UNQUOTED([LAST_MOD_DATE], ["`git log --pretty=format:'%ad' --date=format:'%b %e %Y' -n 1`"], [Last commit date.])
 AC_CONFIG_HEADERS([src/config.h])
 
 AC_CONFIG_MACRO_DIR([m4])
