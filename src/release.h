@@ -19,7 +19,7 @@
 #define RELEASE_H__
 
 namespace release {
-  const char* const version = "0.0.1.dev";             /**< @brief Version number. */
+  const char* const version = "0.0.1";                 /**< @brief Version number. */
   const char* const name = "gcsa_locate";              /**< @brief Package name */
   const char* const short_desc = "GCSA2 seed finder";  /**< @brief Short description. */
   /** @brief Long description. */
