@@ -30,6 +30,7 @@ Installation
 ### Building `gcsa-locate`
 In order to build the tool, simply run:
 
+    ./autogen.sh  # if it is compiled from a git clone.
     ./configure
     make
     sudo make install
