@@ -16,6 +16,8 @@
  */
 
 #include <cstdlib>
+#include <csignal>
+#include <iostream>
 #include <fstream>
 #include <vector>
 #include <string>
@@ -43,6 +45,12 @@ get_option_values( Options& options, seqan::ArgumentParser& parser );
 locate_seeds( std::string& seq_name, std::string& gcsa_name, unsigned int seed_len,
     bool nonoverlapping, std::string& output_name );
 
+  void
+signal_handler( int signal );
+
+std::size_t done_idx = 0;
+std::size_t total_no = 0;
+
 
   int
 main( int argc, char* argv[] )
@@ -55,10 +63,22 @@ main( int argc, char* argv[] )
   if (res != seqan::ArgumentParser::PARSE_OK)
     return res == seqan::ArgumentParser::PARSE_ERROR;
 
+  /* Install signal handler */
+  std::signal( SIGUSR1, signal_handler );
+
   locate_seeds( options.seq_filename, options.gcsa_filename, options.seed_len,
       options.nonoverlapping, options.output_filename );
 
   return EXIT_SUCCESS;
+}
+
+
+  void
+signal_handler( int signal )
+{
+  std::cout << "Located " << ::done_idx << " out of " << ::total_no << " in "
+            << Timer::get_lap( "locate" ).count() << " us: "
+            << ::done_idx * 100 / total_no << "% done." << std::endl;
 }
 
 
@@ -101,6 +121,7 @@ locate_seeds( std::string& seq_name, std::string& gcsa_name, unsigned int seed_l
       seeding( patterns, sequences, seed_len, GreedyOverlapping() );
     }
   }
+  ::total_no = patterns.size();
   std::cout << "Generated " << patterns.size() << " patterns in "
             << Timer::get_duration( "patterns" ).count() << " us." << std::endl;
   std::cout << "Locating patterns..." << std::endl;
@@ -109,6 +130,7 @@ locate_seeds( std::string& seq_name, std::string& gcsa_name, unsigned int seed_l
     for ( const auto& p : patterns ) {
       gcsa::range_type range = index.find( p );
       index.locate( range, results, true );
+      ::done_idx++;
     }
   }
   std::cout << "Located " << results.size() << " occurrences in "
