@@ -1,11 +1,20 @@
 # ctags
 tags
 
-# compile flags
+# Compile flags
 compile_commands.json
 
-#autom4te.cache
+# Generated files by autotools
 autom4te.cache
+Makefile
+config.log
+config.status
+man/
+src/.deps
+src/Makefile
+src/config.h
+src/stamp-h1
+src/gcsa_locate
 
 # test data svg files
 test/data/**/*.svg
