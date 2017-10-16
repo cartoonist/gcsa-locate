@@ -18,11 +18,14 @@
 #include <cstdlib>
 #include <fstream>
 #include <vector>
+#include <string>
 
 #include <seqan/arg_parse.h>
 #include <gcsa/gcsa.h>
 
 #include <config.h>
+#include "seed.h"
+#include "timer.h"
 #include "options.h"
 #include "release.h"
 
@@ -39,10 +42,6 @@ get_option_values( Options& options, seqan::ArgumentParser& parser );
   void
 locate_seeds( std::string& seq_name, std::string& gcsa_name, unsigned int seed_len,
     bool nonoverlapping, std::string& output_name );
-
-  bool
-get_seed( unsigned int& context, std::string& seed, std::string& sequence,
-    unsigned int seed_len, bool nonoverlapping );
 
 
   int
@@ -76,48 +75,49 @@ locate_seeds( std::string& seq_name, std::string& gcsa_name, unsigned int seed_l
     throw std::runtime_error("could not open file '" + gcsa_name + "'" );
   }
   gcsa::GCSA index;
-  index.load( gcsa_file );
-
-  std::string sequence;
-  std::string seed;
+  std::vector< std::string > sequences;
+  std::vector< std::string > patterns;
   std::vector< gcsa::node_type > results;
-  while ( std::getline( seq_file, sequence ) ) {
-    unsigned int context = 0;
-    while ( get_seed ( context, seed, sequence, seed_len, nonoverlapping ) ) {
-      gcsa::range_type range = index.find( seed );
+
+  std::cout << "Loading GCSA index..." << std::endl;
+  index.load( gcsa_file );
+  std::cout << "Loading sequences..." << std::endl;
+  {
+    auto timer = Timer( "sequences" );
+    std::string line;
+    while ( std::getline( seq_file, line ) ) {
+      sequences.push_back( line );
+    }
+  }
+  std::cout << "Loaded " << sequences.size() << " sequences in "
+            << Timer::get_duration( "sequences" ).count() << " us." << std::endl;
+  std::cout << "Generating patterns..." << std::endl;
+  {
+    auto timer = Timer( "patterns" );
+    if ( nonoverlapping ) {
+      seeding( patterns, sequences, seed_len, GreedyNonOverlapping() );
+    }
+    else {
+      seeding( patterns, sequences, seed_len, GreedyOverlapping() );
+    }
+  }
+  std::cout << "Generated " << patterns.size() << " patterns in "
+            << Timer::get_duration( "patterns" ).count() << " us." << std::endl;
+  std::cout << "Locating patterns..." << std::endl;
+  {
+    auto timer = Timer( "locate" );
+    for ( const auto& p : patterns ) {
+      gcsa::range_type range = index.find( p );
       index.locate( range, results, true );
     }
   }
-
+  std::cout << "Located " << results.size() << " occurrences in "
+            << Timer::get_duration( "locate" ).count() << " us." << std::endl;
+  std::cout << "Writing occurrences into file..." << std::endl;
   std::ofstream output_file( output_name, std::ofstream::out );
   for ( auto && r : results ) {
     output_file << gcsa::Node::id( r ) << "\t" << gcsa::Node::offset( r ) << std::endl;
   }
-}
-
-
-  bool
-get_seed( unsigned int& context, std::string& seed, std::string& sequence,
-    unsigned int seed_len, bool nonoverlapping )
-{
-  if ( context + seed_len == sequence.length() + 1 || seed_len > sequence.length() ) {
-    return false;
-  }
-  if ( context + seed_len > sequence.length() + 1 ) {
-    context = sequence.length() - seed_len;
-    nonoverlapping = false;
-  }
-
-  seed = sequence.substr( context, seed_len );
-
-  if ( nonoverlapping ) {
-    context += seed_len;
-  }
-  else {
-    context += 1;
-  }
-
-  return true;
 }
 
 
