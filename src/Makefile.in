@@ -129,6 +129,18 @@ AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
 am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
+COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
+	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+AM_V_CC = $(am__v_CC_@AM_V@)
+am__v_CC_ = $(am__v_CC_@AM_DEFAULT_V@)
+am__v_CC_0 = @echo "  CC      " $@;
+am__v_CC_1 = 
+CCLD = $(CC)
+LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+AM_V_CCLD = $(am__v_CCLD_@AM_V@)
+am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
+am__v_CCLD_0 = @echo "  CCLD    " $@;
+am__v_CCLD_1 = 
 SOURCES = $(gcsa_locate_SOURCES)
 DIST_SOURCES = $(gcsa_locate_SOURCES)
 am__can_run_installinfo = \
@@ -261,7 +273,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 WFLAGS = -Wall -Werror -Wno-vla -pedantic
-gcsa_locate_SOURCES = main.cc
+gcsa_locate_SOURCES = main.cc seed.h timer.h
 gcsa_locate_CXXFLAGS = ${WFLAGS} @OPENMP_CXXFLAGS@ @SEQAN2_CFLAGS@ \
 	@SDSL_CFLAGS@ @GCSA2_CFLAGS@ $(am__empty)
 gcsa_locate_LDADD = @SEQAN2_LIBS@ @GCSA2_LIBS@ @SDSL_LIBS@
