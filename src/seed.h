@@ -49,7 +49,7 @@ typedef Tag< GreedyNonOverlapStrategy > GreedyNonOverlapping;
  */
 template< typename TText >
     inline void
-  _seeding( std::vector< TText >& seeds,
+  seeding( std::vector< TText >& seeds,
       const std::vector< TText >& string_set,
       unsigned int k,
       unsigned int step )
@@ -59,7 +59,7 @@ template< typename TText >
         seeds.push_back( string_set[idx].substr( i, k ) );
       }
     }
-  }  /* -----  end of template function _seeding  ----- */
+  }  /* -----  end of template function seeding  ----- */
 
 /**
  *  @brief  Seeding a set of sequence by reporting overlapping k-mers.
@@ -79,7 +79,7 @@ template< typename TText >
       GreedyOverlapping )
   {
     seeds.clear();
-    _seeding( seeds, string_set, k, 1 );
+    seeding( seeds, string_set, k, 1 );
   }  /* -----  end of template function seeding  ----- */
 
 /**
@@ -100,7 +100,7 @@ template< typename TText >
       NonOverlapping )
   {
     seeds.clear();
-    _seeding( seeds, string_set, k, k );
+    seeding( seeds, string_set, k, k );
   }  /* -----  end of function seeding  ----- */
 
 /**

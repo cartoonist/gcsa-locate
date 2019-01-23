@@ -43,7 +43,7 @@ get_option_values( Options& options, seqan::ArgumentParser& parser );
 
   void
 locate_seeds( std::string& seq_name, std::string& gcsa_name, unsigned int seed_len,
-    bool nonoverlapping, std::string& output_name );
+    unsigned int distance, std::string& output_name );
 
   void
 signal_handler( int signal );
@@ -67,14 +67,14 @@ main( int argc, char* argv[] )
   std::signal( SIGUSR1, signal_handler );
 
   locate_seeds( options.seq_filename, options.gcsa_filename, options.seed_len,
-      options.nonoverlapping, options.output_filename );
+      options.distance, options.output_filename );
 
   return EXIT_SUCCESS;
 }
 
 
   void
-signal_handler( int signal )
+signal_handler( int )
 {
   std::cout << "Located " << ::done_idx << " out of " << ::total_no << " in "
             << Timer::get_lap( "locate" ).count() << " us: "
@@ -84,7 +84,7 @@ signal_handler( int signal )
 
   void
 locate_seeds( std::string& seq_name, std::string& gcsa_name, unsigned int seed_len,
-    bool nonoverlapping, std::string& output_name )
+    unsigned int distance, std::string& output_name )
 {
   std::ifstream seq_file( seq_name, std::ifstream::in | std::ifstream::binary );
   if ( !seq_file ) {
@@ -114,12 +114,7 @@ locate_seeds( std::string& seq_name, std::string& gcsa_name, unsigned int seed_l
   std::cout << "Generating patterns..." << std::endl;
   {
     auto timer = Timer( "patterns" );
-    if ( nonoverlapping ) {
-      seeding( patterns, sequences, seed_len, GreedyNonOverlapping() );
-    }
-    else {
-      seeding( patterns, sequences, seed_len, GreedyOverlapping() );
-    }
+    seeding( patterns, sequences, seed_len, distance );
   }
   ::total_no = patterns.size();
   std::cout << "Generated " << patterns.size() << " patterns in "
@@ -188,8 +183,10 @@ setup_argparser( seqan::ArgumentParser& parser )
         seqan::ArgParseArgument::INTEGER, "INT" ) );
   setRequired( parser, "l" );
   // Overlapping seeds?
-  addOption( parser, seqan::ArgParseOption( "n", "non-overlapping",
-        "Use non-overlapping seeds." ) );
+  addOption( parser, seqan::ArgParseOption( "d", "distance",
+        "Distance between seeds [default: seed length given by \\fB-l\\fP]",
+        seqan::ArgParseArgument::INTEGER, "INT" ) );
+  setDefaultValue( parser, "d", 0 );  /* Default value is seed length. */
   // Output file.
   seqan::ArgParseOption output_arg( "o", "output",
       "Write positions where sequences are matched.",
@@ -206,5 +203,6 @@ get_option_values( Options& options, seqan::ArgumentParser& parser )
   getOptionValue( options.gcsa_filename, parser, "gcsa" );
   getOptionValue( options.output_filename, parser, "output" );
   getOptionValue( options.seed_len, parser, "seed-len" );
-  options.nonoverlapping = isSet( parser, "non-overlapping" );
+  getOptionValue( options.distance, parser, "distance" );
+  if ( options.distance == 0 ) options.distance = options.seed_len;
 }
