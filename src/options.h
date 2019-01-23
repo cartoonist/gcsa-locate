@@ -25,7 +25,7 @@ typedef struct {
   std::string gcsa_filename;
   std::string output_filename;
   unsigned int seed_len;
-  bool nonoverlapping;
+  unsigned int distance;
 } Options;
 
 #endif  // OPTIONS_H__
