@@ -120,10 +120,24 @@ locate_seeds( std::string& seq_name, std::string& gcsa_name, unsigned int seed_l
   std::cout << "Generated " << patterns.size() << " patterns in "
             << Timer<>::get_duration_str( "patterns" ) << "." << std::endl;
   std::cout << "Locating patterns..." << std::endl;
+  std::vector< gcsa::range_type > ranges;
+  gcsa::size_type total = 0;
   {
-    auto timer = Timer<>( "locate" );
+    auto timer = Timer<>( "find" );
     for ( const auto& p : patterns ) {
       gcsa::range_type range = index.find( p );
+      if( !gcsa::Range::empty( range ) ) {
+        ranges.push_back( range );
+        total += index.count( range );
+      }
+    }
+  }
+  std::cout << "Found " << ranges.size() << " patterns matching " << total << " paths in "
+            << Timer<>::get_duration_str( "find" ) << "." << std::endl;
+  total = 0;
+  {
+    auto timer = Timer<>( "locate" );
+    for ( const auto& range : ranges ) {
       index.locate( range, results, true );
       ::done_idx++;
     }
