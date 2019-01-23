@@ -77,7 +77,7 @@ main( int argc, char* argv[] )
 signal_handler( int )
 {
   std::cout << "Located " << ::done_idx << " out of " << ::total_no << " in "
-            << Timer::get_lap( "locate" ).count() << " us: "
+            << Timer<>::get_lap_str( "locate" ) << ": "
             << ::done_idx * 100 / total_no << "% done." << std::endl;
 }
 
@@ -103,25 +103,25 @@ locate_seeds( std::string& seq_name, std::string& gcsa_name, unsigned int seed_l
   index.load( gcsa_file );
   std::cout << "Loading sequences..." << std::endl;
   {
-    auto timer = Timer( "sequences" );
+    auto timer = Timer<>( "sequences" );
     std::string line;
     while ( std::getline( seq_file, line ) ) {
       sequences.push_back( line );
     }
   }
   std::cout << "Loaded " << sequences.size() << " sequences in "
-            << Timer::get_duration( "sequences" ).count() << " us." << std::endl;
+            << Timer<>::get_duration_str( "sequences" ) << "." << std::endl;
   std::cout << "Generating patterns..." << std::endl;
   {
-    auto timer = Timer( "patterns" );
+    auto timer = Timer<>( "patterns" );
     seeding( patterns, sequences, seed_len, distance );
   }
   ::total_no = patterns.size();
   std::cout << "Generated " << patterns.size() << " patterns in "
-            << Timer::get_duration( "patterns" ).count() << " us." << std::endl;
+            << Timer<>::get_duration_str( "patterns" ) << "." << std::endl;
   std::cout << "Locating patterns..." << std::endl;
   {
-    auto timer = Timer( "locate" );
+    auto timer = Timer<>( "locate" );
     for ( const auto& p : patterns ) {
       gcsa::range_type range = index.find( p );
       index.locate( range, results, true );
@@ -129,7 +129,7 @@ locate_seeds( std::string& seq_name, std::string& gcsa_name, unsigned int seed_l
     }
   }
   std::cout << "Located " << results.size() << " occurrences in "
-            << Timer::get_duration( "locate" ).count() << " us." << std::endl;
+            << Timer<>::get_duration_str( "locate" ) << "." << std::endl;
   std::cout << "Writing occurrences into file..." << std::endl;
   std::ofstream output_file( output_name, std::ofstream::out );
   for ( auto && r : results ) {
