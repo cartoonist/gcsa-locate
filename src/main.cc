@@ -141,13 +141,13 @@ locate_seeds( std::string& seq_name, std::string& gcsa_name, unsigned int seed_l
   {
     auto timer = Timer<>( "locate" );
     for ( const auto& range : ranges ) {
-      index.locate( range, results, true );
-      ::total_occs = results.size();
+      index.locate( range, results );
       // TODO: In order to be fair comparison, results should be written to file using async IO.
+      ::total_occs += results.size();
       ::done_idx++;
     }
   }
-  std::cout << "Located " << results.size() << " occurrences in "
+  std::cout << "Located " << ::total_occs << " occurrences in "
             << Timer<>::get_duration_str( "locate" ) << "." << std::endl;
 }
 
