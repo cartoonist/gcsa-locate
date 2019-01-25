@@ -50,6 +50,7 @@ signal_handler( int signal );
 
 std::size_t done_idx = 0;
 std::size_t total_no = 0;
+std::size_t total_occs = 0;
 
 
   int
@@ -76,7 +77,8 @@ main( int argc, char* argv[] )
   void
 signal_handler( int )
 {
-  std::cout << "Located " << ::done_idx << " out of " << ::total_no << " in "
+  std::cout << "Located " << ::done_idx << " out of " << ::total_no
+            << " with " << ::total_occs << " occurrences in "
             << Timer<>::get_lap_str( "locate" ) << ": "
             << ::done_idx * 100 / total_no << "% done." << std::endl;
 }
@@ -139,6 +141,7 @@ locate_seeds( std::string& seq_name, std::string& gcsa_name, unsigned int seed_l
     auto timer = Timer<>( "locate" );
     for ( const auto& range : ranges ) {
       index.locate( range, results, true );
+      ::total_occs = results.size();
       ::done_idx++;
     }
   }
