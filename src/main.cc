@@ -50,6 +50,7 @@ signal_handler( int signal );
 
 std::size_t done_idx = 0;
 std::size_t total_no = 0;
+std::size_t total_occs = 0;
 
 
   int
@@ -76,7 +77,8 @@ main( int argc, char* argv[] )
   void
 signal_handler( int )
 {
-  std::cout << "Located " << ::done_idx << " out of " << ::total_no << " in "
+  std::cout << "Located " << ::done_idx << " out of " << ::total_no
+            << " with " << ::total_occs << " occurrences in "
             << Timer<>::get_lap_str( "locate" ) << ": "
             << ::done_idx * 100 / total_no << "% done." << std::endl;
 }
@@ -84,8 +86,9 @@ signal_handler( int )
 
   void
 locate_seeds( std::string& seq_name, std::string& gcsa_name, unsigned int seed_len,
-    unsigned int distance, std::string& output_name )
+    unsigned int distance, std::string& /* output_name */ )
 {
+  //std::ofstream output_file( output_name, std::ofstream::out );
   std::ifstream seq_file( seq_name, std::ifstream::in | std::ifstream::binary );
   if ( !seq_file ) {
     throw std::runtime_error("could not open file '" + seq_name + "'" );
@@ -138,17 +141,14 @@ locate_seeds( std::string& seq_name, std::string& gcsa_name, unsigned int seed_l
   {
     auto timer = Timer<>( "locate" );
     for ( const auto& range : ranges ) {
-      index.locate( range, results, true );
+      index.locate( range, results );
+      // TODO: In order to be fair comparison, results should be written to file using async IO.
+      ::total_occs += results.size();
       ::done_idx++;
     }
   }
-  std::cout << "Located " << results.size() << " occurrences in "
+  std::cout << "Located " << ::total_occs << " occurrences in "
             << Timer<>::get_duration_str( "locate" ) << "." << std::endl;
-  std::cout << "Writing occurrences into file..." << std::endl;
-  std::ofstream output_file( output_name, std::ofstream::out );
-  for ( auto && r : results ) {
-    output_file << gcsa::Node::id( r ) << "\t" << gcsa::Node::offset( r ) << std::endl;
-  }
 }
 
 
