@@ -86,8 +86,9 @@ signal_handler( int )
 
   void
 locate_seeds( std::string& seq_name, std::string& gcsa_name, unsigned int seed_len,
-    unsigned int distance, std::string& output_name )
+    unsigned int distance, std::string& /* output_name */ )
 {
+  //std::ofstream output_file( output_name, std::ofstream::out );
   std::ifstream seq_file( seq_name, std::ifstream::in | std::ifstream::binary );
   if ( !seq_file ) {
     throw std::runtime_error("could not open file '" + seq_name + "'" );
@@ -142,16 +143,12 @@ locate_seeds( std::string& seq_name, std::string& gcsa_name, unsigned int seed_l
     for ( const auto& range : ranges ) {
       index.locate( range, results, true );
       ::total_occs = results.size();
+      // TODO: In order to be fair comparison, results should be written to file using async IO.
       ::done_idx++;
     }
   }
   std::cout << "Located " << results.size() << " occurrences in "
             << Timer<>::get_duration_str( "locate" ) << "." << std::endl;
-  std::cout << "Writing occurrences into file..." << std::endl;
-  std::ofstream output_file( output_name, std::ofstream::out );
-  for ( auto && r : results ) {
-    output_file << gcsa::Node::id( r ) << "\t" << gcsa::Node::offset( r ) << std::endl;
-  }
 }
 
 
